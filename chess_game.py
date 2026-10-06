@@ -232,6 +232,7 @@ def valid_king_move(board, selected_piece, selected_square, row, column):
 
 selected_square = None
 selected_piece = None
+turn = "white"
 
 def move_piece(board, selected_piece, selected_square, row, column):
     start_row, start_column = selected_square
@@ -252,6 +253,9 @@ def move_piece(board, selected_piece, selected_square, row, column):
     if valid_move == True:
         board[row][column] = selected_piece
         board[start_row][start_column] = ""
+        return True
+    
+    return False
 
 def redraw():
     pieces_t.clear()
@@ -276,21 +280,39 @@ def coordinates_to_square(x, y):
 
     return row, column
 
+def piece_color(piece):
+    white_pieces = ["♙", "♖", "♘", "♗", "♕", "♔"]
+    black_pieces = ["♟", "♜", "♞", "♝", "♛", "♚"]
+
+    if piece in white_pieces:
+        return "white"
+    elif piece in black_pieces:
+        return "black"
+
 def mouse_click(x, y):
     inside_square = define_boundaries(start_x, start_y, size, x, y)
     if inside_square != True:
         return
 
     row, column = coordinates_to_square(x, y)
-    global selected_piece, selected_square
+    global selected_piece, selected_square, turn
 
     if selected_square == None:
         if board[row][column] == "":
             return
+        piece = board[row][column]
+        if piece_color(piece) != turn:
+            return
         selected_square = (row, column)
         selected_piece = board[row][column]
     else:
-        move_piece(board, selected_piece, selected_square, row, column)
+        valid_move = move_piece(board, selected_piece, selected_square, row, column)
+        if valid_move == True:
+            if turn == "white":
+                turn = "black"
+            else:
+                turn = "white"
+                
         selected_piece = None
         selected_square = None
         redraw()
